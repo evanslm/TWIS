@@ -14,3 +14,9 @@ scores="scores/"$tissue
 mkdir -p $scores
 mkdir -p $scores/ensgIDs
 
+
+##############################################################################
+### 1. Download pre-computed GTEx cross-tissue (sCCA) expression prediction models & unzip, and download the FUSION make_scores.R script from the fusion github site (https://github.com/gusevlab/fusion_twas)
+wget http://gusevlab.org/projects/fusion/weights/sCCA_weights_v8_2.zip
+unzip sCCA_weights_v8_2.zip
+
