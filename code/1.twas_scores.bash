@@ -20,3 +20,36 @@ mkdir -p $scores/ensgIDs
 wget http://gusevlab.org/projects/fusion/weights/sCCA_weights_v8_2.zip
 unzip sCCA_weights_v8_2.zip
 
+
+
+##############################################################################
+### 2. Download 1000 Genomes reference data to use. Here, just using a single chromosome (21) from the hg19 build, and convert it to plink2 format while extracting EUR group individuals only.
+### Build hg19 can be downloaded from http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
+wget http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz
+mkdir 1kg
+mv ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz 1kg
+wget ../../1KGv3_hm3/pop_info/1000g_individuals.EUR.txt
+mv 1000g_individuals.EUR.txt 1kg
+plink2 --vcf 1kg/ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz --double-id --keep 1kg/1000g_individuals.EUR.txt --make-pgen --out 1kg/eur --maf 0.01
+
+
+##############################################################################
+### 3. Make score files for each transcript. Here, just for chromosome 21.
+awk '$3==21 {print $2}' sCCA_weights_v8/sCCA3.pos | \
+    xargs -i -P $ncore sh -c "Rscript make_score.R sCCA_weights_v8/'$tissue'/'$tissue'.{}.wgt.RDat > scores/'$tissue'/{}.score"
+
+
+##############################################################################
+### 4.Getting the ENSG IDs for each chromosome separately to parallelize it later across chroms
+cc=21 ### This would be done for each chromosome separately, when doing all chromosomes
+awk -v var=$cc 'FNR>1 && $3==var {print $2}' sCCA_weights_v8/$tissue.pos > "$scores"/ensgIDs/chr"$cc".ensgID.txt
+
+
+##############################################################################
+### 5. Get the unique positions to be retained from the score files
+### DO ONCE FOR EACH NEW TISSUE, do not need to do again
+### Get only the unique rsNumbers that are retained in the TWAS score files (files generated from
+cut -f -1 $scores/*.score | sort | uniq > $scores/rsNum.unique.txt ## Done once, do not need to do again
+awk 'BEGIN { FS=":"} {print $1,$2,$2,$1":"$2}' $scores/rsNum.unique.txt > $scores/rsNum.unique.range.txt
+
+
