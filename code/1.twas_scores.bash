@@ -26,11 +26,10 @@ unzip sCCA_weights_v8_2.zip
 ##############################################################################
 ### 2. Download 1000 Genomes reference data to use. Here, just using a single chromosome (21) from the hg19 build, and convert it to plink2 format while extracting EUR group individuals only.
 ### Build hg19 can be downloaded from http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
+### You will also need a list of the 1KG individuals in the EUR continental group for the plink2 command below.
 wget http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz
 mkdir 1kg
 mv ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz 1kg
-wget ../../1KGv3_hm3/pop_info/1000g_individuals.EUR.txt
-mv 1000g_individuals.EUR.txt 1kg
 plink2 --vcf 1kg/ALL.chr21.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz --double-id --keep 1kg/1000g_individuals.EUR.txt --make-pgen --out 1kg/eur --maf 0.01
 
 
