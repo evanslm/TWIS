@@ -7,13 +7,12 @@
 
 ncore=12 ### However many cores you have available on your machine
 
-tissue="cortex.PEC"
-weight_loc="PsychENCODE_TWAS"
+
+tissue="sCCA3"
+weight_loc="sCCA_weights_v8/"$tissue"/"
 scores="scores/"$tissue
 
-
-
-mkdir -p $scores
+mkdir -p $scores ### Directory for score files & ENSG gene IDs
 mkdir -p $scores/ensgIDs
 
 
