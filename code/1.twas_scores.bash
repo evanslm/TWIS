@@ -49,6 +49,6 @@ awk -v var=$cc 'FNR>1 && $3==var {print $2}' sCCA_weights_v8/$tissue.pos > "$sco
 ### 5. Get the unique positions to be retained from the score files
 ### DO ONCE FOR EACH NEW TISSUE, do not need to do again
 ### Get only the unique rsNumbers that are retained in the TWAS score files (files generated from
-cut -f -1 $scores/*.score | sort | uniq > $scores/rsNum.unique.txt ## Done once, do not need to do again
+cut -f -1 $scores/*.score | sort | uniq > $scores/$tissue.rsNum.unique.txt ## Done once, do not need to do again
 
 
