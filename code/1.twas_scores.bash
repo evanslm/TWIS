@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #### This script creates the score files from the TWAS weights, required to make expression predictions
-#### Uses the FUSION-supplied make_scores.R script to create the scores (you should download this separately before you start)
+#### Uses the[FUSION](https://github.com/gusevlab/fusion_twas)-supplied make_scores.R script to create the scores (you should download this separately before you start)
 #### Currently uses the sCCA cross-tissue weights from FUSION documentation website preprint
 #### Gets the gene IDs split by chromosome for later parallelization across chromosomes
 
