@@ -2,8 +2,9 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-phenotype <- args[1]
-residualized <- args[2]
+residualized <- args[1]
+phenotype <- args[2]
+
 
 cat ("########################\n")
 cat ("command-line arguments:\n")
@@ -12,7 +13,8 @@ cat ("########################\n")
 
 #############################################################################
 ############   1. Read in phenotype data. These only include the rel<0.05 individuals for the phenotype  ############
-load(paste0("phenos/",phenotype,".residualized.RDat"),verbose=T)
+#load(paste0("phenos/",phenotype,".residualized.RDat"),verbose=T)
+dresid <- read.table(paste0("phenos/",phenotype,".residualized.txt"),header=T)
 cat("read in the phenotype\n")
 dim(dresid) 
 
