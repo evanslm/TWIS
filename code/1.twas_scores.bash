@@ -1,8 +1,9 @@
 #!/bin/bash
 
 #### This script creates the score files from the TWAS weights, required to make expression predictions
-#### Uses the [FUSION](https://github.com/gusevlab/fusion_twas) -supplied make_scores.R script to create the scores (you should download this separately before you start)
-### Download GRCh37 ENSEMBLE Gene IDs from biomart here: http://grch37.ensembl.org/biomart/ or use this file with the hg37 data: ensg.ids.hg37.txt
+#### Uses the [FUSION](https://github.com/gusevlab/fusion_twas) -supplied make_scores.R script to create the scores (download this file using the command below)
+wget https://raw.githubusercontent.com/gusevlab/fusion_twas/master/utils/make_score.R
+#### Download GRCh37 ENSEMBLE Gene IDs from biomart here: http://grch37.ensembl.org/biomart/ or use the included file with the hg37 data: ensg.ids.hg37.txt
 #### Currently uses the PsychENCODE Prefrontal Cortex TWAS weights of Gandal et al.
 
 # % # % # % # % # % # % # % # % # % # % # % # % #
