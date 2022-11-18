@@ -22,8 +22,8 @@ startTime="$(date +%s)"
 
 ### setup
 covar="covariates.txt"
-predicted="predicted/"
-residualized="residualized/"
+predicted="predicted"
+residualized="residualized"
 mkdir -p $residualized
 
 ### Residualize imputed gene expression. 
