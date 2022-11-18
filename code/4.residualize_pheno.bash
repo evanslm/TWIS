@@ -26,7 +26,7 @@ phenotype="SIMULATE" ### Either the name of the file (with columns FID,IID,<phen
 covariate="SIMULATE" ### Either the name of the file (with columns FID,IID,cov1,cov2...), or "SIMULATE" for a simulated simulated covariates
 simpheno="norm" ### can be left out, or "binom" or "norm" for a binomially or normally distributed phenotype, respectively
 
-Rscript phenos_residualize.R $phenotype $covariate $simpheno > log.4.residualize.outerr 2>&1
+Rscript phenos_residualize.R $phenotype $covariate $simpheno > ./logs/log.4.residualize.outerr 2>&1
 
 
 ### end timer for script and print the runtime that has elapsed
