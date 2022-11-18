@@ -27,7 +27,7 @@ residualized="residualized"
 mkdir -p $residualized
 
 ### Residualize imputed gene expression. 
-Rscript expression_residualize.R --pred_scores $predicted --resid_out $residualized --covar SIMULATE > log.3.residualize.outerr 2>&1
+Rscript expression_residualize.R --pred_scores $predicted --resid_out $residualized --covar SIMULATE > ./logs/log.3.residualize.outerr 2>&1
 echo "completed residualizing predicted gene expression"
 
 ### end timer for script and print the runtime that has elapsed
