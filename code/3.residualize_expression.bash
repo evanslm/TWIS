@@ -29,7 +29,7 @@ residualized="residualized"
 mkdir -p $residualized
 
 ### copy gene list file to generic filename to serve as input for expression_residualize.R
-cp $predicted/predicted.genelist.$study.txt predicted.genelist.txt
+cp $predicted/predicted.genelist.$study.txt $predicted/predicted.genelist.txt
 
 ### Residualize imputed gene expression. 
 Rscript expression_residualize.R --pred_scores $predicted --resid_out $residualized --covar SIMULATE > ./logs/log.3.residualize.outerr 2>&1
