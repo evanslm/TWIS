@@ -24,5 +24,8 @@ RcppArmadillo
 foreach
 iterators
 doMC
+
+#in R, this can be done with the following line of code:
+install.packages(c("RcppArmadillo","optparse","data.table","Matrix","RcppArmadillo","foreach","iterators","doMC"))
 ```
 
