@@ -5,8 +5,24 @@
 ### Download GRCh37 ENSEMBLE Gene IDs from biomart here: http://grch37.ensembl.org/biomart/ or use this file with the hg37 data: ensg.ids.hg37.txt
 #### Currently uses the PsychENCODE Prefrontal Cortex TWAS weights of Gandal et al.
 
+# % # % # % # % # % # % # % # % # % # % # % # % #
+#  -------------------------------------------  #
+# |               TWIS Pipeline               | #
+# |      University of Colorado Boulder       | #
+# |     Institute for Behavioral Genetics     | #
+# | ========================================= | #
+# |               Luke M. Evans               | #
+# |         luke.m.evans@colorado.edu         | #
+# | ========================================= | #
+# |        Written in November of 2022        | #
+#  -------------------------------------------  #
+# % # % # % # % # % # % # % # % # % # % # % # % #
 
 ncore=6 ### However many cores you have available on your machine
+
+### start timer for script
+date
+startTime="$(date +%s)"
 
 ### Set names and create directories for score files & ENSG gene IDs
 tissue="pfc" ## prefrontal cortex
@@ -71,3 +87,22 @@ plink2 --pfile 1kg/eur.21 \
        --freq \
        --out 1kg/eur.21.keep
 
+### end timer for script and print the runtime that has elapsed
+echo " *-* *-* *-* *-* *-* END OF SCRIPT *-* *-* *-* *-* *-* "
+date
+endTime="$(date +%s)"
+diff=$(echo "$endTime-$startTime" |bc)
+diff=$(($diff + 0))
+
+if [ $diff -lt "$((60))" ]
+then
+  printf %.3f "$((1000 * $diff/1))e-3"; echo " seconds"
+elif [ $diff -lt "$((60 * 60))" ]
+then
+  printf %.3f "$((1000 * $diff/60))e-3"; echo " minutes"
+elif [ $diff -lt "$((60 * 60 * 24))" ]
+then
+  printf %.3f "$((1000 * $diff/3600))e-3"; echo " hours"
+else
+  printf %.3f "$((1000 * $diff/86400))e-3"; echo " days"
+fi
