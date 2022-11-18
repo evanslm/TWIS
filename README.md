@@ -15,6 +15,7 @@ Some of the steps are performed in pieces, where the analysis is split into some
 
 
 List of R packages to be installed for the pipeline:
+```
 RcppArmadillo
 optparse
 data.table
@@ -23,3 +24,5 @@ RcppArmadillo
 foreach
 iterators
 doMC
+```
+
