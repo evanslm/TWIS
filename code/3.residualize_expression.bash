@@ -22,7 +22,9 @@ startTime="$(date +%s)"
 
 ### setup
 covar="covariates.txt"
-predicted="predicted"
+tissue="pfc"
+study="1kg"
+predicted="predicted/"$tissue"/"$study
 residualized="residualized"
 mkdir -p $residualized
 
