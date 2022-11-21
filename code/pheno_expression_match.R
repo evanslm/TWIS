@@ -34,9 +34,9 @@ g1<-as.character(genesID[1,1])
 load(paste0(residualized,"/",g1,"_predicted_residuals.RDat"),verbose=T)
 pd<-merge(dresid,d)
 pd<-data.frame(pd[,c(1:3)])  ### NOTE THAT THIS HAS THE PHENOTYPE IN THE 3nd COL, in order of the expression data
-ids<-geall[,1:2] ### Matrix of IDs, only to use to quickly merge so as to order the retained individuals in next step (4) below
+ids<-pd[,1:2] ### Matrix of IDs, only to use to quickly merge so as to order the retained individuals in next step (4) below
 print("done identifying individuals with both pheno and expression data")
-print (nrow(geall))
+print (nrow(pd))
 rm(dresid) ## To save space
 rm(d)
 
@@ -52,7 +52,7 @@ for(tt in 1:ng){
         load(paste0(residualized,"/",g1,"_predicted_residuals.RDat"))
         id.exp<-merge(ids,d,sort=F) ### To cut out only the individuals retained in step 3, order in the same way as in step 3
     },error=function(e){cat("ERROR : gene ",tt,", ",conditionMessage(e), "\n")})
-    if(!all(geall[,2]==id.exp[,2])){
+    if(!all(pd[,2]==id.exp[,2])){
         cat(paste0("ID Order does not match. gene: ",g1,", index: ",tt))
         quit()
     }
@@ -65,8 +65,8 @@ for(tt in 1:ng){
 }
 
 if(!ncol(pd)==(nrow(genesID)+3)){
-    print ("different numbers of genes for genesID & geall:")
-    print (c(nrow(genesID),ncol(geall)))
+    print ("different numbers of genes for genesID & pd:")
+    print (c(nrow(genesID),ncol(pd)))
     quit(save="no")
 }
 
