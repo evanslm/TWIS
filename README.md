@@ -30,7 +30,7 @@ install.packages(c("RcppArmadillo","optparse","data.table","Matrix","RcppArmadil
 ```
 
 Run the bash scripts in order.  Example slurm sbatch submissions are shown below.
-Note that the slurm specifications will be different for larger datasets a different compute platforms
+Note that the slurm specifications will be different for larger datasets and different compute platforms.
 
 ```
 #############################################################################################
