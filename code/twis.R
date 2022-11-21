@@ -111,6 +111,8 @@ cat("output: ",dim(U),"\n")
 
 #############################################################################
 ###########   5. Write out the results
-save(U,file=paste0(opt$results,opt$phenotype,".",opt$nparts,".",opt$part,".RDat"))
+#save(U,file=paste0(opt$results,opt$phenotype,".",opt$nparts,".",opt$part,".RDat"))
+write.table(U, paste0(opt$results,opt$phenotype,".",opt$nparts,".",opt$part,".txt"), quote = F, col.names = T, row.names = F, sep = "\t")
+
 print(paste0("completed part ", opt$part," of ",opt$nparts))
 
