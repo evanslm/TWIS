@@ -2,8 +2,8 @@ This directory contains two example gene sets of 20 genes each, drawn randomly f
 
 
 
-cut -d ',' -f -1 ../cpdL10H20_cortex.PEC.chr21.csv | tr '_' '\n' | sort | uniq| perl -MList::Util -e 'print List::Util::shuffle <>' | head -20 > test.chr21.geneset.txt
+`cut -d ',' -f -1 ../cpdL10H20_cortex.PEC.chr21.csv | tr '_' '\n' | sort | uniq| perl -MList::Util -e 'print List::Util::shuffle <>' | head -20 > test.chr21.geneset.txt
 perl -MList::Util -e 'print List::Util::shuffle <>' ../ensg.ids.hg37.txt | awk '$6!=21' | cut -f -1 | head -20 > test.otherchromosomes.geneset.txt
 
 echo 'example/test.chr21.geneset.txt' > test.genesets.txt
-echo 'example/test.otherchromosomes.geneset.txt' >> test.genesets.txt
+echo 'example/test.otherchromosomes.geneset.txt' >> test.genesets.txt`
