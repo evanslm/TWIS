@@ -1,6 +1,8 @@
 ### Example files
 
-This directory contains two example gene sets of 20 genes each, drawn randomly from either the genes on chromosome 21 that were actually included in the example TWIS example, or alternatively, all other chromosomes in the genome. These were generated using the commands below, as a way to demonstrate the E-TWIS approach.
+This directory contains the meta-analyzed TWIS results (`cpdL10H20_cortex.PEC.chr21.csv`) reported in the original TWIS paper for binary-coded cigarettes per day (Low<=10 per day, high>20 per day), using imputed expression in the PFC. To reduce the size of the file, only pairs on chromosome 21 are contained here.
+
+This directory also contains two example gene sets of 20 genes each, drawn randomly from either the genes on chromosome 21 that were actually included in the example TWIS example, or alternatively, all other chromosomes in the genome. These were generated using the commands below, as a way to demonstrate the E-TWIS approach.
 
 
 
