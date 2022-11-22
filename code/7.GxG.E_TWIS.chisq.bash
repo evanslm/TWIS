@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J gxg.network
+#SBATCH -J E-TWIS
 #SBATCH -N 1-1
 #SBATCH --ntasks=2
 #SBATCH --time=72:00:00
