@@ -1,11 +1,9 @@
-### Resampling pairs of genes to match gene sets of interest to estimate a null distribution of connectivity
+### R script to perform E-TWIS analysis of gene sets
 ### INCLUDING BOTH CORRELATION AND PHYSICAL DISTANCE THRESHOLDS
-### Luke M. Evans
-### Last updated: 2022/04/27
 
 library(data.table)
 library(RcppArmadillo)
-library(optparse,lib="/projects/luev6784/R")
+library(optparse)
 
 
 option_list = list(
