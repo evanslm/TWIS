@@ -8,6 +8,6 @@ The example gene sets are of 20 genes each, drawn randomly from either the genes
 
 
 
-`cut -d ',' -f -1 ../cpdL10H20_cortex.PEC.chr21.csv | tr '_' '\n' | sort | uniq| perl -MList::Util -e 'print List::Util::shuffle <>' | head -20`
+`cut -d ',' -f -1 cpdL10H20_cortex.PEC.chr21.csv | tr '_' '\n' | sort | uniq| perl -MList::Util -e 'print List::Util::shuffle <>' | head -20`
 
 `perl -MList::Util -e 'print List::Util::shuffle <>' ../ensg.ids.hg37.txt | awk '$6!=21' | cut -f -1 | head -20`
