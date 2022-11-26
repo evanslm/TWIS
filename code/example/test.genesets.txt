@@ -1,2 +1,0 @@
-example/test.chr21.geneset.txt
-example/test.otherchromosomes.geneset.txt
