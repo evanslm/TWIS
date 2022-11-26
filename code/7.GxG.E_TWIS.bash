@@ -17,7 +17,7 @@ export OMP_NUM_THREADS=1
 ## Performs both the chi-squared-based enrichment test and a ramdom resampling approach
 ## --nsamp set here to 20 so that it will complete in a relatively short time, but we suggest at least 500+ randomly resampled genesets
 
-Rscript GxG.E_TWIS.resampling.R \
+Rscript GxG.E_TWIS.R \
 	--input=example/cpdL10H20_cortex.PEC.meta.txt \
 	--genesets=example/test.genesets.txt \
 	--gene_info=example/cortex.PEC.prediction_gene_model_info.txt \
