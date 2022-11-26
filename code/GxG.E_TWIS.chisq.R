@@ -1,81 +1,173 @@
-### R script to perform E-TWIS analysis of gene sets
-### INCLUDING BOTH CORRELATION AND PHYSICAL DISTANCE THRESHOLDS
+### Resampling pairs of genes to match gene sets of interest to estimate a null distribution of connectivity
+### Luke M. Evans
+### Last updated: 2022/11/23
 
 library(data.table)
 library(RcppArmadillo)
+library(foreach)
+library(iterators)
+library(doMC)
 library(optparse)
 
+ncore<-as.numeric(system("env | grep SLURM_NTASKS | cut -d '=' -f 2",intern=TRUE)) 
+registerDoMC(cores=ncore)
 
 option_list = list(
   make_option("--input", action="store", default=NA, type='character',
               help="the input file with meta-analyzed TWIS statistics, in csv format"),
+  make_option("--output", action="store", default=format(Sys.time(), "E_TWIS.resampling.%Y_%b_%d_%X.txt"), type='character',
+              help="output file name"),
   make_option("--rthreshold", action="store", default=0.05, type='numeric',
-              help="Threshold for pairwise correlation of predicted expression for removing from analysis"),
+              help="Threshold for (absolute value) pairwise correlation of predicted expression for removing from analysis. Default=0.05."),
   make_option("--dist.thresh", action="store", default=1e6, type='numeric',
-              help="bp threshold between gene midpoints beyond which to keep in analyses when on the same chromosome"),
+              help="bp threshold between gene midpoints beyond which to keep in analyses when on the same chromosome. Default=1e6."),
   make_option("--genesets", action="store", default=NA, type='character',
+              help="the list of genesets, each a file with one column of ENSG gene IDs"),
+  make_option("--nsamp", action="store", default=1000, type='numeric',
+              help="The number of resampled replicates to perform. Default=1000."),
+  make_option("--gene_info", action="store", default=NA, type='character',
               help="the list of genesets, each a file with one column of ENSG gene IDs")
 )
 opt = parse_args(OptionParser(option_list=option_list))
 
+
+## Gene sets to test
 genesetnames<-read.table(opt$genesets,header=F)
-
-gID<-read.table('ensg.ids.hg37.txt',sep="\t",header=T)
-gID$pos.med<-apply(cbind(gID$Gene.start..bp.,gID$Gene.end..bp.),1,median)
-gID1<-gID[,c(1,6,7)];colnames(gID1)<-c("ID1","CHR1","pos1")
-gID2<-gID1;colnames(gID2)<-c("ID2","CHR2","pos2")
-
-
-## Output header
-test<-paste("GeneSetName","GeneSetSize","GeneSetSizeInTWIS","GeneSetPairsInTWIS","GeneSetPairsinTWIS_thresh","Chisq","Chisq_p","Chisq_thresh","Chisq_thresh_p","\n",sep=" ")
-cat(test)
-
-
-## All genes in the genome with expression data. allg is a list of gene names
-allg<-read.table("predicted/predicted.genelist.txt",header=F)
+cat("Number of genesets to test:", nrow(genesetnames),"\n")
 
 ## All gene-gene interaction results for trait/tissue (here just on chromosome 21):
-d<-fread(opt$input,sep=",",header=T)
+d<-fread(opt$input,header=T)
+cat("Done reading in TWIS summary statistics\n")
 
-ids<-do.call(rbind,strsplit(d$MARKER,'_')) # Split the marker name into the pair of genes
+##############################################################################################################
+### get genes with expression data, including their size, number of SNPs in best-supported FUSION model, and position
+gID<-read.table(opt$gene_info,header=T,sep="\t")
+gID$length<-gID$endbp-gID$startbp+1
+gID$pos<-apply(cbind(gID$endbp,gID$startbp),1,median)
+gID<-gID[,c(1,6,7,11,12)] ## Keeping only the columns needed later
 
-d<-cbind(ids,d)
-colnames(d)[c(1:2)]<-c("ID1","ID2")
 
+## Merge location and gene info with TWIS results, and get bp distance between pairs:
+gIDtmp<-gID;colnames(gIDtmp)<-paste0(colnames(gID),"1")
+d<-merge(d,gIDtmp,keep.x=T)
+
+
+gIDtmp<-gID;colnames(gIDtmp)<-paste0(colnames(gID),"2")
+d<-merge(d,gIDtmp,keep.x=T,by="ID2")
+
+d$bpdist<-abs(d$pos1-d$pos2)
+
+cat("dims of dataset:", dim(d),"\n")
+cat("Done merging with location data\n")
+cat("Starting gene set analyses\n")
+
+##############################################################################################################
+### Identify pairs that don't pass thresholds for distance and expression correlation, and remove those
+gs.pairs.thresh<-which(d$ExpCorr<=opt$rthreshold & d$ExpCorr>=-opt$rthreshold & (d$CHR1!=d$CHR2 | d$bpdist>=opt$dist.thresh))
+cat("dropped ", nrow(d)-length(gs.pairs.thresh), " pairs due to expression correlation or physical distance thresholds\n")
+d<-d[gs.pairs.thresh,]
+cat("remaining ", nrow(d), " pairs for E-TWIS analysis\n")
+
+##############################################################################################################
+### Testing within each gene set:
+## for(gg in 1:length(genesetnames)){
+## The target gene set:
+
+## Output header
+header<-c("GeneSetName","GeneSetSize","GeneSetSizeInTWIS","GeneSetPairsInTWIS","X2","X2_p","X2_mean","Nresamp_larger","Nresamp","resamp_p")
+cat(header)
+
+
+gg=1
+U<-NULL
 for(gg in 1:nrow(genesetnames)){
-    ## The target gene set:
+
+    ## Read in the geneset
     gsname<-genesetnames[gg,1]
     gs<-read.table(gsname,header=F)
     ng.set<-nrow(gs)
-    gset<-gs[which(gs[,1]%in%allg[,1]),]
-    ng<-length(gset) ## The number of genes that are actually in the TWAS gxg dataset, which may not include all for various reasons
+    gset<-gs[which(gs[,1]%in%gID$ID),]
+    ng<-length(gset) ### The number of genes that are actually in the TWIS results
 
-    ## Only run when the number of genes in the TWIS dataset are >=10
     if(ng>=10){
-        ## Estimate network connectivity of the target gene set (using the "all" meta-analyzed Z-scores):
         gs.pairs<-which(d$ID1%in%gs$V1 & d$ID2%in%gs$V1)
-        d.gs.pairs<-d[gs.pairs,]
-        d.gs.pairs<-merge(d.gs.pairs,gID1,keep.x=T,by="ID1")
-        d.gs.pairs<-merge(d.gs.pairs,gID2,keep.x=T,by="ID2")
-        d.gs.pairs$bpdist<-abs(d.gs.pairs$pos1-d.gs.pairs$pos2)
+        ngs.pairs<-length(gs.pairs)
+
+        ## Calculate the X^2 for this gene set for comparison to the resampling below:
+        Z2sum<-sum((d$Z[gs.pairs])^2)
+        Z2p<-pchisq(Z2sum,ngs.pairs,lower.tail=F)
+        meanZ2sum<-Z2sum/ngs.pairs
         
-        ## pairs that pass correlation and distance cutoffs
-        gs.pairs.thresh<-which(d.gs.pairs$PairwiseExpressionCorrelation<=opt$rthreshold & d.gs.pairs$PairwiseExpressionCorrelation>=-opt$rthreshold & (d.gs.pairs$CHR1!=d.gs.pairs$CHR2 | d.gs.pairs$bpdist>=opt$dist.thresh))
+         
+        ##Set up the resampling:
+        ## The lengths & number of SNPs within each gene, tabulated. Note that with a larger number of genes, the bin sizes could be smaller:
+        gset.sizes<-gID[which(gID$ID %in% gset),]
+        glength.hist<-hist(gset.sizes$length,plot=FALSE)
+        gnsnp.hist<-hist(gset.sizes$nsnp,plot=FALSE)
+        
+        ## Making the same breaks within the genset and finding all genes within each breakpoint for length & nsnps across the whole genome to sample from:
+        gID$lengthbin<-NA
+        for(bb in 1:length(glength.hist$breaks)){
+            gID$lengthbin[which(gID$length>=glength.hist$breaks[bb])]<-bb
+        }
+        
+        gID$nsnpbin<-NA
+        for(bb in 1:length(gnsnp.hist$breaks)){
+            gID$nsnpbin[which(gID$nsnp>=gnsnp.hist$breaks[bb])]<-bb
+        }
+        
+        genesize.bins<-table(as.data.table(cbind(gID$lengthbin,gID$nsnpbin)))
+        gset.size<-gID[which(gID$ID %in% gset),]
+        gset.size.bins<-table(as.data.table(cbind(gset.size$lengthbin,gset.size$nsnpbin)))
+        nl<-nrow(gset.size.bins)
+        ns<-ncol(gset.size.bins)
+        
 
-        ## sum(Z^2) for all pairs:
-        Z2sum<-sum((d.gs.pairs$Z_all)^2)
-        Z2p<-pchisq(Z2sum,length(gs.pairs),lower.tail=F)
+        ## Estimate chisq of nsamp random sets of genes of the same size as the target set & matching the length & num SNPs (roughly):
+        x2.null<-foreach(ii=1:opt$nsamp,.combine=rbind)%dopar%{
 
-        ## sum(Z^2) only for pairs that pass cutoffs:
-        Z2sumr<-sum((d.gs.pairs$Z_all[gs.pairs.thresh])^2)
-        Z2pr<-pchisq(Z2sumr,length(gs.pairs.thresh),lower.tail=F)
+            ## Sample ng random genes in the same bins as the focal geneset genes
+            gs.samp<-NULL
+            for(l in 1:nl){
+                for(s in 1:ns){
+                    nmatch<-gset.size.bins[l,s]
+                    if( nmatch > 0 ){
+                        gbins.match<-which(gID$lengthbin==l & gID$nsnpbin==s)
+                        if(length(gbins.match)>0) gs.samp<-c(gs.samp,sample(gbins.match,nmatch,replace=F))
+                    }
+                }
+            }
+              
+            if(length(gs.samp)<ng) gs.samp<-c(gs.samp,sample(nrow(gID),ng-length(gs.samp),replace=F)) ### Adding more if there aren't enough
 
-        ## Write out the results
-        test<-paste(gsname,ng.set,ng,length(gs.pairs),length(gs.pairs.thresh),Z2sum,Z2p,Z2sumr,Z2pr,sep=" ")
+            gs.resamp<-which(d$ID1%in%gID$ID[gs.samp] & d$ID2%in%gID$ID[gs.samp])
+            n.gp.tmp<-length(gs.resamp)
+            x2.tmp<-sum(d$Z[gs.resamp]^2)/n.gp.tmp
+        
+            (c(x2.tmp,n.gp.tmp))
+        }
+        x2.null<-cbind(x2.null,pchisq(x2.null[,1]*x2.null[,2],x2.null[,2],lower.tail=F))
+        ## print(summary(x2.null))
+        ## length(which(pchisq(x2.null[,1]*x2.null[,2],x2.null[,2],lower.tail=F)<=0.05))
+        gsname.short<-tail(strsplit(gsname,"/")[[1]],1)
+        ## fwrite(x2.null,file=paste0(trait,"_",tissue,"_",gsname.short,"_GeneSets.nullresampling.txt"),quote=F,sep=" ",row.names=F,col.names=T)
+      
+        ## Calculate empirical p-value from resampling:
+        x2.big<-length(which(x2.null[,1]>=meanZ2sum))
+        n.complete<-nrow(x2.null)
+        p.val<-x2.big/n.complete
+
+        test<-c(gsname,ng.set,ng,ngs.pairs,Z2sum,Z2p,meanZ2sum,x2.big,n.complete,p.val)
         cat(test,"\n")
-    } else{
-        message(paste0(gsname,'has only ', ng,' genes in the TWIS dataset'))
+        U<-rbind(U,test)
+        
     }
 }
+
+colnames(U)<-c("GeneSetName","GeneSetSize","GeneSetSizeInTWIS","GeneSetPairsInTWIS","X2","X2_p","X2_mean","Nresamp_larger","Nresamp","resamp_p")
+write.table(U,file=opt$output,quote=F,sep=" ",row.names=F,col.names=T)
+
+
+cat(date(),": Done with analysis, writing output\n")
 
 
