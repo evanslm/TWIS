@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH -J E-TWIS
+#SBATCH -J e_twis
 #SBATCH -N 1-1
 #SBATCH --ntasks=2
 #SBATCH --time=72:00:00
-#SBATCH --mem=85000
-#SBATCH -o GeneSets.chisq.%A.outerr
+#SBATCH --mem=150gb
+#SBATCH -o E_TWIS.%A.outerr
 
 
 date
@@ -14,9 +14,16 @@ module load R/4.0.4
 export OMP_NUM_THREADS=1
 
 
-## To run E-TWIS analysis using meta-analyzed results from multiple datasets. See the example input file in the example directory for the format of the input data.
-## The gene set names are listed in test.genesets.txt, found in the example directory.
-Rscript GxG.network.chisq.allsets2.R \
-	--input example/cpdL10H20_cortex.PEC.chr21.csv \
-	--geneset example/test.genesets.txt \
-	> cpdL10H20.cortex.PEC.e_twis.txt 2> cpdL10H20.cortex.PEC.e_twis.err
+## Performs both the chi-squared-based enrichment test and a ramdom resampling approach
+## --nsamp set here to 20 so that it will complete in a relatively short time, but we suggest at least 500+ randomly resampled genesets
+
+Rscript GxG.E_TWIS.resampling.R \
+	--input=example/cpdL10H20_cortex.PEC.meta.txt \
+	--genesets=example/test.genesets.txt \
+	--gene_info=example/cortex.PEC.prediction_gene_model_info.txt \
+	--nsamp=20
+
+
+
+
+date
