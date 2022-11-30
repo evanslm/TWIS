@@ -97,4 +97,26 @@ sbatch -J 6_twis -N 1-1 --ntasks=8 --qos=preemptable --constraint=skylake --time
 
 # Final results will be saved to the ./results/ folder in tab-delimited .txt format
 # To instead save the results in .RDat format, see the commented code at the end of twis.R
+
+#############################################################################################
+################ 7.GxG.E_TWIS.bash ##########################################################
+#############################################################################################
+
+# This script performs both the chi-squared-based enrichment test and a ramdom resampling approach
+# --nsamp set here to 20 so that it will complete in a relatively short time, but we suggest at least 500+ randomly resampled genesets
+
+## Below are the parameters that can be specified for GxG.E_TWIS.R (which is run by the bash script)
+# --input "the input file with meta-analyzed TWIS statistics, in csv format"
+# --output "E_TWIS.resampling.%Y_%b_%d_%X.txt"
+# --rthreshold "Threshold for (absolute value) pairwise correlation of predicted expression for removing from analysis. Default=0.05."
+# --dist.thresh "bp threshold between gene midpoints beyond which to keep in analyses when on the same chromosome. Default=1e6."
+# --genesets "the list of genesets, each a file with one column of ENSG gene IDs"
+# --nsamp "The number of resampled replicates to perform. Default=1000."
+# --gene_info "the list of genesets, each a file with one column of ENSG gene IDs"
+
+efile="./logs/7_GxG_E_TWIS.err"
+ofile="./logs/7_GxG_E_TWIS.log"
+sbatch -J 7_e_twis -N 1-1 --ntasks=2 --qos=preemptable --constraint=skylake --time=4:00:00 --mem=150gb --error=$efile --output=$ofile 7.GxG.E_TWIS.bash
+
+
 ```
