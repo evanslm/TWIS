@@ -9,6 +9,9 @@
 #SBATCH --mem=150gb
 #SBATCH -o E_TWIS.%A.outerr
 
+## Performs both the chi-squared-based enrichment test and a ramdom resampling approach
+## --nsamp set here to 20 so that it will complete in a relatively short time, but we suggest at least 500+ randomly resampled genesets
+
 # % # % # % # % # % # % # % # % # % # % # % # % #
 #  -------------------------------------------  #
 # |               TWIS Pipeline               | #
@@ -21,9 +24,6 @@
 # |        Written in November of 2022        | #
 #  -------------------------------------------  #
 # % # % # % # % # % # % # % # % # % # % # % # % #
-
-## Performs both the chi-squared-based enrichment test and a ramdom resampling approach
-## --nsamp set here to 20 so that it will complete in a relatively short time, but we suggest at least 500+ randomly resampled genesets
 
 ### start timer for script
 date
