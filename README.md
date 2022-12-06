@@ -24,7 +24,7 @@ iterators
 doMC
 
 #in R, these packages can be installed with:
-install.packages(c("RcppArmadillo","optparse","data.table","Matrix","RcppArmadillo","foreach","iterators","doMC"))
+install.packages(c("optparse","data.table","Matrix","RcppArmadillo","foreach","iterators","doMC"))
 ```
 
 Run the bash scripts in order.  Example slurm sbatch submissions are shown below.
