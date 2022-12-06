@@ -6,7 +6,8 @@ The method and steps are described in the [TWIS preprint](https://doi.org/10.110
 
 ### Organization
 
-`code/` contains all the scripts to perform TWIS and E-TWIS
+`code/` contains all the scripts to perform TWIS and E-TWIS.
+Within `code/` is `example/`, which contains files that can be used to perform a basic analysis with publicly available data.
 
 The code here includes bash and R scripts used to perform a TWIS and E-TWIS analysis. It is organized by each step in the process, not as a unified single program. It is set up to perform an example analysis using publicly available 1000 Genomes data, and publicly released TWAS weights.
 
