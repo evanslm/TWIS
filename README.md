@@ -1,7 +1,8 @@
 # TWIS: Transcriptome Wide Interaction Study
 **Code and scripts to run TWIS**
 
-The method and steps are described in the [TWIS preprint](https://doi.org/10.1101/2022.08.16.504187)
+The method and steps are described in the [TWIS preprint](https://doi.org/10.1101/2022.08.16.504187).
+The results described in that manuscript are avilable through the online supplements, and the TWIS summary statistics are avilable through [Dryad](https://doi.org/10.5061/dryad.866t1g1tw).
 
 
 ### Organization
